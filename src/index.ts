@@ -1,1 +1,3 @@
-console.log("Hello via Bun!");
+import QuotoMoto from "./classes/quotomoto";
+
+new QuotoMoto();
