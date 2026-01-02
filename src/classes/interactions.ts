@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
 	type Client,
@@ -28,6 +28,7 @@ export default class Interactions<Custom> {
 	}
 
 	private readLock() {
+		if (!existsSync(this.lockfile)) return "";
 		return readFileSync(this.lockfile, "utf-8");
 	}
 

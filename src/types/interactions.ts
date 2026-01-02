@@ -1,8 +1,9 @@
 import type {
-	CommandInteraction,
+	ChatInputCommandInteraction,
 	InteractionType,
 	MessageComponentInteraction,
 	SlashCommandBuilder,
+	SlashCommandSubcommandsOnlyBuilder,
 } from "discord.js";
 
 export type DeployableInteraction<Custom> =
@@ -11,13 +12,14 @@ export type DeployableInteraction<Custom> =
 
 interface BaseDeployableInteraction<Custom, Interaction> {
 	name: string;
-	handle: (custom: Custom, interaction: Interaction) => void;
+	// biome-ignore lint/suspicious/noExplicitAny: Allow to return early in handler
+	handle: (custom: Custom, interaction: Interaction) => any;
 }
 
 export interface DeployableCommandInteraction<Custom>
-	extends BaseDeployableInteraction<Custom, CommandInteraction> {
+	extends BaseDeployableInteraction<Custom, ChatInputCommandInteraction> {
 	type: InteractionType.ApplicationCommand;
-	data: SlashCommandBuilder;
+	data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
 }
 
 export interface DeployableMessageComponentInteraction<Custom>
