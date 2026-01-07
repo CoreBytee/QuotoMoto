@@ -15,4 +15,17 @@ export default class QuotoMotoGuild {
 	get id() {
 		return this.guild.id;
 	}
+
+	async getQuoteChannel() {
+		const channelId = await this.settings.getQuoteChannel();
+		if (!channelId) return null;
+
+		const channel = await this.guild.channels.fetch(channelId);
+		if (!channel) return null;
+
+		if (!channel.isTextBased()) return null;
+		if (!channel.isSendable()) return null;
+
+		return channel;
+	}
 }

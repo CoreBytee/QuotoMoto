@@ -22,16 +22,18 @@ export default class GuildSettings {
 		return await this.database
 			.selectFrom("guildSettings")
 			.where("id", "=", this.id)
-			.selectAll()
+			.select("guildSettings.quoteChannelId")
 			.executeTakeFirstOrThrow();
 	}
 
 	async getQuoteChannel() {
-		return await this.database
+		const { quoteChannelId } = await this.database
 			.selectFrom("guildSettings")
 			.where("id", "=", this.id)
 			.select("quoteChannelId")
-			.executeTakeFirst();
+			.executeTakeFirstOrThrow();
+
+		return quoteChannelId;
 	}
 
 	async setQuoteChannel(quoteChannelId: string | null) {

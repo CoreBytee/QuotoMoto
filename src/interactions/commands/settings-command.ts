@@ -29,9 +29,7 @@ export async function handle(
 	quotomoto: QuotoMoto,
 	interaction: ChatInputCommandInteraction,
 ) {
-	console.log("received interaction", interaction.options.getSubcommand());
-
-	if (!interaction.inGuild()) throw new Error("Interaction not in guild");
+	if (!interaction.inGuild()) return;
 
 	if (!isPermitted(interaction.member as GuildMember))
 		return interaction.reply({
