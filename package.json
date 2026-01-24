@@ -9,6 +9,7 @@
 		"discord.js": "^14.25.1",
 		"kysely": "^0.28.9",
 		"kysely-bun-sqlite": "^0.4.0",
+		"pretty-bytes": "^7.1.0",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
 		"satori": "^0.18.3"

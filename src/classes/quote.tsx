@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
+import prettyBytes from "pretty-bytes";
 import satori from "satori";
 import { fonts } from "src/constants/fonts";
 import QuoteTemplate from "src/templates/quote-template";
@@ -51,5 +52,7 @@ export default class Quote {
 
 		await Bun.write("./test.png", pngBuffer);
 		console.log(`Rendered in ${Date.now() - start}ms`);
+
+		console.log(prettyBytes(pngBuffer.byteLength));
 	}
 }
