@@ -6,12 +6,21 @@ import Database from "./database";
 import QuotoMotoGuild from "./guild";
 import Interactions from "./interactions";
 
+let instance: QuotoMoto | null = null;
+
 export default class QuotoMoto {
+	static instance() {
+		if (!instance) throw new Error("QuotoMoto instance not initialized");
+		return instance;
+	}
+
 	database: Database<DatabaseSchema>;
 	discord: Client<boolean>;
 	interactions: Interactions<QuotoMoto>;
 	guilds: QuotoMotoGuild[] = [];
 	constructor() {
+		instance = this;
+
 		this.database = Database.connect<DatabaseSchema>("quotomoto.db");
 
 		this.discord = new Client({
