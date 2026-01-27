@@ -1,6 +1,5 @@
 import { join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
-import prettyBytes from "pretty-bytes";
 import satori from "satori";
 import { fonts } from "src/constants/fonts";
 import QuoteTemplate from "src/templates/quote-template";
@@ -19,11 +18,10 @@ export default class Quote {
 
 		this.person = new DiscordQuotePerson();
 		this.date = new Date();
-		this.background = "framea47.png";
+		this.background = "frame29.png";
 	}
 
 	async render() {
-		const start = Date.now();
 		const frame = await Bun.file(
 			join(import.meta.dir, "../..", "backgrounds", this.background),
 		).bytes();
@@ -42,17 +40,10 @@ export default class Quote {
 			},
 		);
 
-		console.log(`Satori in ${Date.now() - start}ms`);
-
-		await Bun.write("./test.svg", svg);
-
 		const resvg = new Resvg(svg, { fitTo: { mode: "original" } });
-		const pngData = resvg.render();
-		const pngBuffer = pngData.asPng();
+		const image = resvg.render();
+		const png = image.asPng();
 
-		await Bun.write("./test.png", pngBuffer);
-		console.log(`Rendered in ${Date.now() - start}ms`);
-
-		console.log(prettyBytes(pngBuffer.byteLength));
+		return png;
 	}
 }
