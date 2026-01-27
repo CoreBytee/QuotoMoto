@@ -1,6 +1,6 @@
-import type BaseQuotePerson from "./base-quote-person";
+import type AbstractQuotePerson from "./abstract-quote-person";
 
-export default class DiscordQuotePerson implements BaseQuotePerson {
+export default class DiscordQuotePerson implements AbstractQuotePerson {
 	get name() {
 		return "DiscordUser";
 	}

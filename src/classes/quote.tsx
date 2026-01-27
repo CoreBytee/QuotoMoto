@@ -3,12 +3,12 @@ import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 import { fonts } from "src/constants/fonts";
 import QuoteTemplate from "src/templates/quote-template";
-import type BaseQuotePerson from "./quote-person/base-quote-person";
+import type AbstractQuotePerson from "./quote-person/abstract-quote-person";
 import DiscordQuotePerson from "./quote-person/discord-quote-person";
 
 export default class Quote {
 	quote: string;
-	person: BaseQuotePerson;
+	person: AbstractQuotePerson;
 	date: Date;
 	background: string;
 

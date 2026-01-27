@@ -1,6 +1,6 @@
-import type BaseQuotePerson from "./base-quote-person";
+import type AbstractQuotePerson from "./abstract-quote-person";
 
-export default class OtherQuotePerson implements BaseQuotePerson {
+export default class OtherQuotePerson implements AbstractQuotePerson {
 	get name() {
 		return "[Random person]";
 	}
