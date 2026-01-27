@@ -1,4 +1,5 @@
 import {
+	ChannelType,
 	type ChatInputCommandInteraction,
 	type GuildMember,
 	InteractionContextType,
@@ -54,6 +55,12 @@ export async function handle(
 			break;
 		}
 		case "setchannel": {
+			const channel = interaction.channel;
+			if (channel?.type !== ChannelType.GuildText)
+				return interaction.reply({
+					content: "The quote channel can only be set to a text channel.",
+				});
+
 			guild.settings.setQuoteChannel(interaction.channelId);
 			await interaction.reply({
 				content: `Set quote channel to <#${interaction.channelId}>`,
