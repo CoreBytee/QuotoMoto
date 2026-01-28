@@ -1,35 +1,70 @@
-import { join } from "node:path";
+import { readdirSync } from "node:fs";
+import { basename, join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
+import {
+	ContainerBuilder,
+	type Guild,
+	italic,
+	MediaGalleryBuilder,
+	type Message,
+	MessageFlags,
+	type TextChannel,
+	TextDisplayBuilder,
+	type User,
+	userMention,
+} from "discord.js";
+import random from "just-random";
 import satori from "satori";
 import { fonts } from "src/constants/fonts";
 import QuoteTemplate from "src/templates/quote-template";
-import type AbstractQuotePerson from "./quote-person/abstract-quote-person";
-import DiscordQuotePerson from "./quote-person/discord-quote-person";
+import type { DatabaseSchema } from "src/types/database-schema";
+import type Database from "./database";
+import type AbstractQuoteTarget from "./quote-target/abstract-quote-target";
+
+const BACKGROUNDS_DIRECTORY = join(import.meta.dir, "../..", "backgrounds");
+
+const BACKGROUNDS = readdirSync(BACKGROUNDS_DIRECTORY).map((file) =>
+	basename(file, ".png"),
+);
 
 export default class Quote {
+	id: number | null = null;
+	message: Message | null = null;
+
 	quote: string;
-	person: AbstractQuotePerson;
+	target: AbstractQuoteTarget;
+	guild: Guild;
+	quoter: User;
+
 	date: Date;
 	background: string;
 
-	constructor() {
-		this.quote =
-			"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+	constructor(
+		quote: string,
+		target: AbstractQuoteTarget,
+		guild: Guild,
+		quoter: User,
+	) {
+		this.quote = quote;
+		this.target = target;
+		this.guild = guild;
+		this.quoter = quoter;
 
-		this.person = new DiscordQuotePerson();
 		this.date = new Date();
-		this.background = "frame29.png";
+		this.background = random(BACKGROUNDS)!;
+	}
+
+	get backgroundPath() {
+		return join(BACKGROUNDS_DIRECTORY, `${this.background}.png`);
 	}
 
 	async render() {
-		const frame = await Bun.file(
-			join(import.meta.dir, "../..", "backgrounds", this.background),
-		).bytes();
+		const frame = await Bun.file(this.backgroundPath).bytes();
 
 		const svg = await satori(
 			<QuoteTemplate
 				quote={this.quote}
-				person={this.person.name}
+				target={await this.target.getName()}
 				year={this.date.getFullYear()}
 				background={Buffer.from(frame).toString("base64")}
 			/>,
@@ -45,5 +80,63 @@ export default class Quote {
 		const png = image.asPng();
 
 		return png;
+	}
+
+	async post(channel: TextChannel) {
+		const image = await this.render();
+
+		this.message = await channel.send({
+			flags: [MessageFlags.IsComponentsV2],
+			components: [
+				new ContainerBuilder()
+					.addTextDisplayComponents(
+						new TextDisplayBuilder().setContent(`"${italic(this.quote)}"`),
+					)
+					.addTextDisplayComponents(
+						new TextDisplayBuilder().setContent(
+							`\\- ${
+								this.target.type === "discord"
+									? userMention(this.target.identifier)
+									: this.target.identifier
+							} ${this.date.getFullYear()}`,
+						),
+					)
+					.addMediaGalleryComponents(
+						new MediaGalleryBuilder().addItems((item) =>
+							item
+								.setDescription("Quote Image")
+								.setURL("attachment://quote.png"),
+						),
+					),
+			],
+			files: [
+				{
+					attachment: Buffer.from(image),
+					name: "quote.png",
+				},
+			],
+		});
+	}
+
+	async save(database: Database<DatabaseSchema>) {
+		if (!this.message) throw new Error("Cannot save quote without message");
+
+		const result = await database
+			.insertInto("quotes")
+			.values({
+				guildId: this.guild.id,
+				channelId: this.message.channel.id,
+				messageId: this.message.id,
+				quoterId: this.quoter.id,
+				targetType: this.target.type,
+				targetId: this.target.identifier,
+				quote: this.quote,
+				backgroundId: this.background,
+				date: Math.floor(this.date.getTime() / 1000),
+			})
+			.returning("id")
+			.executeTakeFirstOrThrow();
+
+		this.id = result.id;
 	}
 }

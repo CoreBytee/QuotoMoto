@@ -1,4 +1,4 @@
-import type { Guild } from "discord.js";
+import type { Guild, TextChannel } from "discord.js";
 import GuildSettings from "./guild-settings";
 import type QuotoMoto from "./quotomoto";
 
@@ -26,6 +26,6 @@ export default class QuotoMotoGuild {
 		if (!channel.isTextBased()) return null;
 		if (!channel.isSendable()) return null;
 
-		return channel;
+		return channel as TextChannel;
 	}
 }

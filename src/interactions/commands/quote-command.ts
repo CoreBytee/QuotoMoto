@@ -3,13 +3,15 @@ import {
 	type ChatInputCommandInteraction,
 	InteractionContextType,
 	InteractionType,
-	italic,
+	MessageFlags,
 	SlashCommandBuilder,
-	userMention,
 } from "discord.js";
+import Quote from "src/classes/quote";
+import DiscordQuoteTarget from "src/classes/quote-target/discord-quote-target";
+import OtherQuoteTarget from "src/classes/quote-target/other-quote-target";
 import type QuotoMoto from "../../classes/quotomoto";
 
-export const name = "savequote";
+export const name = "quote";
 export const type = InteractionType.ApplicationCommand;
 
 export const data = new SlashCommandBuilder()
@@ -55,34 +57,29 @@ export async function handle(
 	quotomoto: QuotoMoto,
 	interaction: ChatInputCommandInteraction,
 ) {
-	if (!interaction.inGuild()) return;
+	if (!interaction.inGuild() || !interaction.guild) return;
 
 	const guild = quotomoto.getGuild(interaction.guildId);
 	if (!guild) throw new Error("Guild not found");
 
 	const channel = await guild.getQuoteChannel();
-	if (!channel) return;
+	if (!channel)
+		return interaction.reply({
+			content: `Quote channel is not set. Please ask an administrator to set it using ${bold("/settings setchannel")}.`,
+			flags: [MessageFlags.Ephemeral],
+		});
 
-	switch (interaction.options.getSubcommand()) {
-		case "here": {
-			const person = interaction.options.getUser("person", true);
-			const quote = interaction.options.getString("quote", true);
+	const subCommand = interaction.options.getSubcommand();
 
-			channel.send(
-				`${italic(quote)}\n\\- ${userMention(person.id)} ${new Date().getFullYear()}`,
-			);
+	const quote = new Quote(
+		interaction.options.getString("quote", true),
+		subCommand === "here"
+			? new DiscordQuoteTarget(interaction.options.getUser("person", true).id)
+			: new OtherQuoteTarget(interaction.options.getString("person", true)),
+		interaction.guild,
+		interaction.user,
+	);
 
-			break;
-		}
-		case "elsewhere": {
-			const person = interaction.options.getString("person", true);
-			const quote = interaction.options.getString("quote", true);
-
-			channel.send(
-				`${italic(quote)}\n\\- ${bold(person)} ${new Date().getFullYear()}`,
-			);
-
-			break;
-		}
-	}
+	await quote.post(channel);
+	await quote.save(quotomoto.database);
 }

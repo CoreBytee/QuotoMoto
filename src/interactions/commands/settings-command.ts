@@ -59,6 +59,7 @@ export async function handle(
 			if (channel?.type !== ChannelType.GuildText)
 				return interaction.reply({
 					content: "The quote channel can only be set to a text channel.",
+					flags: [MessageFlags.Ephemeral],
 				});
 
 			guild.settings.setQuoteChannel(interaction.channelId);

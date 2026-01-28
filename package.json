@@ -7,6 +7,7 @@
 		"@fontsource/rubik": "^5.2.8",
 		"@resvg/resvg-js": "^2.6.2",
 		"discord.js": "^14.25.1",
+		"just-random": "^3.2.0",
 		"kysely": "^0.28.9",
 		"kysely-bun-sqlite": "^0.4.0",
 		"pretty-bytes": "^7.1.0",

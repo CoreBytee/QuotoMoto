@@ -1,11 +1,11 @@
 export default function QuoteTemplate({
 	quote,
-	person,
+	target,
 	year,
 	background,
 }: {
 	quote: string;
-	person: string;
+	target: string;
 	year: number;
 	background: string;
 }) {
@@ -53,7 +53,7 @@ export default function QuoteTemplate({
 						textAlign: "center",
 					}}
 				>
-					{person} {year}
+					{target} {year}
 				</p>
 			</div>
 			{/* Credit Footer */}
