@@ -8,6 +8,7 @@ import {
 	MediaGalleryBuilder,
 	type Message,
 	MessageFlags,
+	SeparatorBuilder,
 	type TextChannel,
 	TextDisplayBuilder,
 	type User,
@@ -32,6 +33,7 @@ export default class Quote {
 	message: Message | null = null;
 
 	quote: string;
+	context: string | null = null;
 	target: AbstractQuoteTarget;
 	guild: Guild;
 	quoter: User;
@@ -41,11 +43,13 @@ export default class Quote {
 
 	constructor(
 		quote: string,
+		context: string | null,
 		target: AbstractQuoteTarget,
 		guild: Guild,
 		quoter: User,
 	) {
 		this.quote = quote;
+		this.context = context;
 		this.target = target;
 		this.guild = guild;
 		this.quoter = quoter;
@@ -64,6 +68,7 @@ export default class Quote {
 		const svg = await satori(
 			<QuoteTemplate
 				quote={this.quote}
+				context={this.context}
 				target={await this.target.getName()}
 				year={this.date.getFullYear()}
 				background={Buffer.from(frame).toString("base64")}
@@ -90,7 +95,9 @@ export default class Quote {
 			components: [
 				new ContainerBuilder()
 					.addTextDisplayComponents(
-						new TextDisplayBuilder().setContent(`"${italic(this.quote)}"`),
+						new TextDisplayBuilder().setContent(
+							`${this.context ? `(\\*${this.context}							\\*) ` : ""}"${italic(this.quote)}"`,
+						),
 					)
 					.addTextDisplayComponents(
 						new TextDisplayBuilder().setContent(
@@ -101,6 +108,7 @@ export default class Quote {
 							} ${this.date.getFullYear()}`,
 						),
 					)
+					.addSeparatorComponents(new SeparatorBuilder())
 					.addMediaGalleryComponents(
 						new MediaGalleryBuilder().addItems((item) =>
 							item
@@ -131,6 +139,7 @@ export default class Quote {
 				targetType: this.target.type,
 				targetId: this.target.identifier,
 				quote: this.quote,
+				context: this.context,
 				backgroundId: this.background,
 				date: Math.floor(this.date.getTime() / 1000),
 			})

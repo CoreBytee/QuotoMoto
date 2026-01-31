@@ -14,6 +14,7 @@ export type DatabaseSchema = {
 		targetType: string;
 		targetId: string;
 		quote: string;
+		context: string | null;
 		backgroundId: string;
 		date: number;
 	};

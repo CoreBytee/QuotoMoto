@@ -1,10 +1,12 @@
 export default function QuoteTemplate({
 	quote,
+	context,
 	target,
 	year,
 	background,
 }: {
 	quote: string;
+	context: string | null;
 	target: string;
 	year: number;
 	background: string;
@@ -30,6 +32,21 @@ export default function QuoteTemplate({
 					alignItems: "center",
 				}}
 			>
+				{context && (
+					<p
+						style={{
+							fontFamily: "Rubik",
+							fontSize: 36,
+							fontWeight: 400,
+							color: "white",
+							textShadow: "2px 2px 10px rgba(0, 0, 0, 1)",
+							textAlign: "center",
+							marginBottom: 50,
+						}}
+					>
+						*<i>{context}</i>*
+					</p>
+				)}
 				<p
 					style={{
 						fontFamily: "Rubik",

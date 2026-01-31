@@ -33,6 +33,13 @@ export const data = new SlashCommandBuilder()
 					.setName("quote")
 					.setDescription("The quote to save")
 					.setRequired(true),
+			)
+			.addStringOption((builder) =>
+				builder
+					.setName("context")
+					.setDescription(
+						"Add a little bit of context to make it even funnier",
+					),
 			),
 	)
 	.addSubcommand((sub) =>
@@ -50,6 +57,13 @@ export const data = new SlashCommandBuilder()
 					.setName("quote")
 					.setDescription("The quote to save")
 					.setRequired(true),
+			)
+			.addStringOption((builder) =>
+				builder
+					.setName("context")
+					.setDescription(
+						"Add a little bit of context to make it even funnier",
+					),
 			),
 	);
 
@@ -73,6 +87,7 @@ export async function handle(
 
 	const quote = new Quote(
 		interaction.options.getString("quote", true),
+		interaction.options.getString("context") ?? null,
 		subCommand === "here"
 			? new DiscordQuoteTarget(interaction.options.getUser("person", true).id)
 			: new OtherQuoteTarget(interaction.options.getString("person", true)),
@@ -82,4 +97,9 @@ export async function handle(
 
 	await quote.post(channel);
 	await quote.save(quotomoto.database);
+
+	return interaction.reply({
+		content: `Quote saved successfully! You can view it here: ${quote.message!.url}`,
+		flags: [MessageFlags.Ephemeral],
+	});
 }
