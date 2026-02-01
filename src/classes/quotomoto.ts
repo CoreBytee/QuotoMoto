@@ -24,11 +24,7 @@ export default class QuotoMoto {
 		this.database = Database.connect<DatabaseSchema>("quotomoto.db");
 
 		this.discord = new Client({
-			intents: [
-				GatewayIntentBits.Guilds,
-				GatewayIntentBits.GuildMessages,
-				GatewayIntentBits.MessageContent,
-			],
+			intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 		});
 
 		console.info("Logging in to discord");
