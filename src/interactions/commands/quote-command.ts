@@ -95,7 +95,16 @@ export async function handle(
 		interaction.user,
 	);
 
-	await quote.post(channel);
+	try {
+		await quote.post(channel);
+	} catch (error) {
+		console.error("Failed to post quote:", error);
+		return interaction.reply({
+			content: `Failed to post quote: ${(error as Error).message}`,
+			flags: [MessageFlags.Ephemeral],
+		});
+	}
+
 	await quote.save(quotomoto.database);
 
 	return interaction.reply({
