@@ -24,7 +24,8 @@
 		"typescript": "^5"
 	},
 	"scripts": {
-		"dev": "bun --watch src/index.ts",
+		"start": "bun run .",
+		"dev": "bun run --watch .",
 		"lint": "bun run biome check --fix",
 		"knip": "knip-bun",
 		"hash-images": "bun run ./scripts/hash-images.ts"
